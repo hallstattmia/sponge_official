@@ -3,7 +3,10 @@
 
 #include "byte_stream.hh"
 
+#include <algorithm>
 #include <cstdint>
+#include <deque>
+#include <iostream>
 #include <string>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
@@ -11,9 +14,16 @@
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
+    size_t unass_base;        //!< The index of the first unassmbled byte
+    size_t unass_size;        //!< The number of bytes in the substrings stored but not yet reassmebled
+    bool _eof;                //!< The last byte has arrived
+    std::deque<char> buffer;  //!< The unassembled strings
+    std::deque<bool> bitmap;  //!< buffer bitmap
+    ByteStream _output;       //!< The reassembled in-order byte stream
+    size_t _capacity;         //!< The maximum number of bytes
 
-    ByteStream _output;  //!< The reassembled in-order byte stream
-    size_t _capacity;    //!< The maximum number of bytes
+    void check_contiguous();
+    size_t real_size(const std::string &data, const size_t index);
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
